@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useUserStore } from "~/stores/users";
 // Define message interface
-
+const route = useRoute();
 const userStore = useUserStore();
-const { messages } = storeToRefs(userStore);
-
+const { chat } = storeToRefs(userStore);
+let senderId = "";
 const newMessage = ref("");
 let ws: WebSocket;
 function InitWebSocket() {
@@ -14,22 +14,20 @@ function InitWebSocket() {
   }
 }
 const sendMessage = () => {
-  console.log(ws);
-  ws.onopen = (event) => {
-    ws.send("Here's some text that the server is urgently awaiting!");
-  };
-  // if (newMessage.value.trim()) {
-  //   messages.value.push({
-  //     user: "User", // You can change this to dynamic user names
-  //     text: newMessage.value.trim(),
-  //   });
-  //   newMessage.value = ""; // Clear input field after sending
-  // }
+  const form = JSON.stringify({
+    senderId: Number(senderId),
+    chatId: Number(route.params.id),
+    replyToMessageId: 0,
+    content: newMessage.value,
+    filePath: "",
+  });
+  ws.send(form);
 };
 
 onMounted(() => {
+  senderId = localStorage.getItem("senderId") || "";
   InitWebSocket();
-  // userStore.getMessages(Number(route.params.id));
+  userStore.getMessages(Number(route.params.id));
 });
 
 onUnmounted(() => {
@@ -41,15 +39,21 @@ onUnmounted(() => {
   <div
     class="flex flex-col bg-white p-4 rounded-lg shadow-lg h-96 w-96 overflow-y-auto"
   >
+    <div class="w-full h-10 border-b p-2">
+      <p>
+        Name:
+        {{ chat?.users?.find((el) => el.id !== Number(senderId))?.username }}
+      </p>
+    </div>
     <div class="flex-1 overflow-y-auto mb-4 space-y-4">
       <div
-        v-for="(message, index) in messages"
+        v-for="(message, index) in chat.messages"
         :key="index"
         class="flex items-start space-x-2"
       >
-        <div class="font-semibold text-blue-500">{{ message.user }}:</div>
+        <div class="font-semibold text-blue-500">{{ message.content }}:</div>
         <div class="bg-gray-100 p-2 rounded-lg text-sm">
-          {{ message.text }}
+          {{ message.content }}
         </div>
       </div>
     </div>

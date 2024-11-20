@@ -1,8 +1,6 @@
 export default defineNuxtRouteMiddleware((to) => {
-    const authStore = useAuthStore()
-  
-    if (to.path === '/chat' && !authStore.isAuthenticated) {
-      return navigateTo('/login')
-    }
-  })
-  
+  const token = localStorage.getItem("token");
+  if (to.path === "/chat" && !token) {
+    return navigateTo("/login");
+  }
+});

@@ -11,9 +11,6 @@
         @click="handleNavigateToChat(user)"
       >
         <p>{{ user.username }}</p>
-        <!-- <NuxtLink :to="`/chat/${user.id}`"
-          ><p>{{ user.username }}</p></NuxtLink
-        > -->
       </li>
     </ul>
     <div v-if="route.name === 'chat-id'"><RouterView /></div>
@@ -43,7 +40,7 @@ const logout = () => {
   authStore.logout();
 };
 onMounted(async () => {
-  userStore.getUsers();
+  // userStore.getUsers();
 });
 
 function handleNavigateToChat(user: User) {
@@ -54,11 +51,10 @@ function handleNavigateToChat(user: User) {
       meParse.chats.some((chat2) => chat1.id === chat2.id)
     );
     if (matchingChats.length > 0) {
-      console.log("Matching chats:", matchingChats);
       router.push(`/chat/${matchingChats[0].id}`);
     } else {
       userStore.createChat({
-        chatName: "Test",
+        chatName: "-",
         creatorId: meParse.id,
         participantId: user.id,
       });

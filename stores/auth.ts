@@ -27,6 +27,7 @@ export const useAuthStore = defineStore("auth", {
 
         if (response.statusCode === 200) {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("senderId", response.data.userInfo.id);
           localStorage.setItem("webSocketUrl", response.data.webSocketUrl);
           localStorage.setItem(
             "userData",

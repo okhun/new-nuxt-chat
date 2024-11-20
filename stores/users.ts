@@ -1,17 +1,41 @@
 import { defineStore } from "pinia";
-export interface User {
-  username: string;
-  id: number;
-}
-interface Chat {
+// export interface User {
+//   username: string;
+//   id: number;
+// }
+interface ChatPayload {
   chatName: string;
   creatorId: number;
   participantId: number;
+}
+interface Chat {
+  id: number;
+  chatName: string;
+  chatType: string;
+  messages: Message[]; // Assuming messages have a structure to define separately
+  users: User[];
+}
+
+interface Message {
+  // Define message structure if needed. For now, it is an empty array in the example.
+  id?: number;
+  content?: string;
+  senderId?: number;
+  timestamp?: string; // ISO 8601 string
+}
+
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
 }
 export const useUserStore = defineStore("users", {
   state: () => ({
     users: [] as User[],
     messages: [],
+    chat: {} as Chat,
   }),
   actions: {
     async getUsers() {
@@ -24,7 +48,7 @@ export const useUserStore = defineStore("users", {
         console.error("Login failed", error);
       }
     },
-    async createChat(payload: Chat) {
+    async createChat(payload: ChatPayload) {
       try {
         const { $customFetch } = useNuxtApp();
         const response = await $customFetch(`/api/chats/create`, {
@@ -43,10 +67,10 @@ export const useUserStore = defineStore("users", {
       try {
         const { $customFetch } = useNuxtApp();
         const response: any = await $customFetch(
-          `/api/messages/get-by-chat-id/${chatId}`
+          `/api/chats/get-by-id/${chatId}`
         );
 
-        this.messages = response.data || [];
+        this.chat = response.data || {};
       } catch (error) {
         console.error("Login failed", error);
       }
